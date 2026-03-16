@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty.knowledge.module.knowledge.mapper.KbKnowledgeMapper">
+
+    <resultMap id="KbKnowledgeResultMap" type="com.beauty.knowledge.module.knowledge.domain.entity.KbKnowledge">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="summary" property="summary"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="type" property="type"/>
+        <result column="cover_url" property="coverUrl"/>
+        <result column="status" property="status"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="author_id" property="authorId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="score" property="score"/>
+    </resultMap>
+
+    <select id="fullTextSearch" resultMap="KbKnowledgeResultMap">
+        SELECT id,
+               title,
+               content,
+               summary,
+               category_id,
+               type,
+               cover_url,
+               status,
+               view_count,
+               author_id,
+               created_at,
+               updated_at,
+               MATCH(title, content) AGAINST(#{keyword} IN BOOLEAN MODE) AS score
+        FROM kb_knowledge
+        WHERE MATCH(title, content) AGAINST(#{keyword} IN BOOLEAN MODE)
+          AND status = 1
+        ORDER BY score DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="fullTextSearchCount" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM kb_knowledge
+        WHERE MATCH(title, content) AGAINST(#{keyword} IN BOOLEAN MODE)
+          AND status = 1
+    </select>
+
+</mapper>

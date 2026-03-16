@@ -35,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new DisabledException("账号已禁用");
         }
 
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + sysUser.getRole().toUpperCase());
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + sysUser.getRole());
         return User.withUsername(String.valueOf(sysUser.getId()))
                 .password(sysUser.getPassword())
                 .authorities(List.of(authority))

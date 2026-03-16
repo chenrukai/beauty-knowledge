@@ -17,6 +17,8 @@ beauty:
   jwt:
     secret: ${BEAUTY_JWT_SECRET:}
     expire-in-seconds: 86400
+  minio:
+    bucket-name: ${BEAUTY_MINIO_BUCKET_NAME:beauty-knowledge}
 
 logging:
   level:

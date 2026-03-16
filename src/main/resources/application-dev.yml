@@ -27,6 +27,7 @@ beauty:
     endpoint: http://localhost:9000
     access-key: beauty
     secret-key: beauty123456
+    bucket-name: beauty-knowledge
 
   milvus:
     host: localhost
@@ -50,6 +51,7 @@ beauty:
     intent-timeout: 30000
 
   pipeline:
+    task-type: KNOWLEDGE_PROCESS
     max-retry: 3
     embed-batch-size: 32
     chunk-size: 400
