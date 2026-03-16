@@ -41,6 +41,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String servletPath = request.getServletPath();
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || "/api/auth/login".equals(uri)
+                || "/api/auth/login".equals(servletPath)
+                || uri.startsWith("/api/auth/login/")
+                || servletPath.startsWith("/api/auth/login/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
@@ -58,8 +69,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         Long userId = jwtUtil.getUserId(token);
         String blackKey = RedisKeyConstant.userToken(userId);
-        Boolean blacklisted = stringRedisTemplate.hasKey(blackKey);
-        if (Boolean.TRUE.equals(blacklisted)) {
+        String blackToken = stringRedisTemplate.opsForValue().get(blackKey);
+        if (StringUtils.hasText(blackToken) && blackToken.equals(token)) {
             writeUnauthorized(response);
             return;
         }

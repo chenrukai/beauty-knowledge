@@ -6,8 +6,10 @@ const request = axios.create({
 });
 
 request.interceptors.request.use((config) => {
+  const reqUrl = config.url || "";
+  const isLoginApi = reqUrl.includes("/auth/login");
   const token = localStorage.getItem("beauty_token");
-  if (token) {
+  if (token && !isLoginApi) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -17,6 +19,7 @@ request.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const status = error?.response?.status;
+    const serverMsg = error?.response?.data?.message;
     if (status === 401) {
       localStorage.removeItem("beauty_token");
       localStorage.removeItem("beauty_user");
@@ -24,7 +27,7 @@ request.interceptors.response.use(
         location.href = "/login";
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(new Error(serverMsg || error?.message || "请求失败"));
   }
 );
 

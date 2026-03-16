@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
         long remaining = jwtUtil.getRemainingExpire(token);
         long ttlSeconds = Math.max(remaining, 1L);
         String key = RedisKeyConstant.userToken(userId);
-        stringRedisTemplate.opsForValue().set(key, "1", ttlSeconds, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(key, token, ttlSeconds, TimeUnit.SECONDS);
         log.info("User logout and token blacklisted, userId={}", userId);
     }
 
