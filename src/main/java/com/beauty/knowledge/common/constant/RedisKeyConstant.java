@@ -3,6 +3,7 @@ package com.beauty.knowledge.common.constant;
 public interface RedisKeyConstant {
 
     String CHAT_SESSION_TEMPLATE = "chat:session:%s";
+    String CHAT_HISTORY_TEMPLATE = "chat:history:%s";
     String USER_TOKEN_TEMPLATE = "user:token:%s";
     String KNOWLEDGE_HOT_TEMPLATE = "knowledge:hot:%s";
     String FILE_HASH_TEMPLATE = "file:hash:%s";
@@ -20,6 +21,10 @@ public interface RedisKeyConstant {
 
     static String chatSession(Long userId) {
         return CHAT_SESSION_TEMPLATE.formatted(userId);
+    }
+
+    static String chatHistory(String sessionId) {
+        return CHAT_HISTORY_TEMPLATE.formatted(sessionId);
     }
 
     static String userToken(Long userId) {

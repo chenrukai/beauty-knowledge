@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.beauty.knowledge.module.rag.mapper.KbChunkSearchMapper">
+
+    <select id="bm25Search" resultType="java.lang.Long">
+        SELECT c.id
+        FROM kb_chunk c
+                 LEFT JOIN kb_knowledge k ON k.id = c.knowledge_id
+        WHERE MATCH(c.content) AGAINST(#{keyword} IN BOOLEAN MODE)
+        <if test="categoryId != null">
+            AND k.category_id = #{categoryId}
+        </if>
+        ORDER BY MATCH(c.content) AGAINST(#{keyword} IN BOOLEAN MODE) DESC
+            LIMIT #{topk}
+    </select>
+
+    <select id="findByIdsWithFile" resultType="map">
+        SELECT c.id,
+               c.content,
+               c.page,
+               c.file_id,
+               f.original_name AS file_name
+        FROM kb_chunk c
+                 INNER JOIN kb_file f ON f.id = c.file_id
+        WHERE c.id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

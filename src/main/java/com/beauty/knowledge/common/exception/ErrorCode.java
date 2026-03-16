@@ -10,6 +10,7 @@ public enum ErrorCode {
     FILE_HASH_DUPLICATE(ResultCode.FILE_HASH_DUPLICATE.getCode(), ResultCode.FILE_HASH_DUPLICATE.getMessage()),
     FILE_PROCESSING(ResultCode.FILE_PROCESSING.getCode(), ResultCode.FILE_PROCESSING.getMessage()),
     KNOWLEDGE_NOT_FOUND(ResultCode.KNOWLEDGE_NOT_FOUND.getCode(), ResultCode.KNOWLEDGE_NOT_FOUND.getMessage()),
+    ENTITY_NAME_EXISTS(ResultCode.ENTITY_NAME_EXISTS.getCode(), ResultCode.ENTITY_NAME_EXISTS.getMessage()),
     CATEGORY_HAS_CHILDREN(ResultCode.CATEGORY_HAS_CHILDREN.getCode(), ResultCode.CATEGORY_HAS_CHILDREN.getMessage()),
     BAD_REQUEST(ResultCode.BAD_REQUEST.getCode(), ResultCode.BAD_REQUEST.getMessage()),
     UNAUTHORIZED(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getMessage()),

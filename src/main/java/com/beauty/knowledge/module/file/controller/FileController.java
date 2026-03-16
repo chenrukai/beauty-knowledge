@@ -1,6 +1,8 @@
 package com.beauty.knowledge.module.file.controller;
 
 import com.beauty.knowledge.common.result.Result;
+import com.beauty.knowledge.common.result.PageResult;
+import com.beauty.knowledge.module.file.domain.dto.TaskPageDTO;
 import com.beauty.knowledge.module.file.domain.entity.ProcessTask;
 import com.beauty.knowledge.module.file.domain.vo.FileUploadVO;
 import com.beauty.knowledge.module.file.service.FileService;
@@ -39,6 +41,12 @@ public class FileController {
     @GetMapping("/task/{taskId}")
     public Result<ProcessTask> getTask(@PathVariable Long taskId) {
         return Result.success(fileService.getTask(taskId));
+    }
+
+    @Operation(summary = "任务分页列表")
+    @GetMapping("/task/list")
+    public Result<PageResult<ProcessTask>> taskList(TaskPageDTO dto) {
+        return Result.success(fileService.pageTasks(dto));
     }
 
     @Operation(summary = "重试任务")

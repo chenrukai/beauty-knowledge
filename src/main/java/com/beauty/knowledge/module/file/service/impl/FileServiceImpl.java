@@ -1,14 +1,17 @@
 package com.beauty.knowledge.module.file.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.beauty.knowledge.common.constant.RabbitMQConstant;
 import com.beauty.knowledge.common.exception.BusinessException;
 import com.beauty.knowledge.common.exception.ErrorCode;
+import com.beauty.knowledge.common.result.PageResult;
 import com.beauty.knowledge.common.result.ResultCode;
 import com.beauty.knowledge.common.util.FileHashUtil;
 import com.beauty.knowledge.common.util.SecurityUtil;
 import com.beauty.knowledge.infrastructure.storage.MinioStorageService;
 import com.beauty.knowledge.infrastructure.vector.MilvusVectorStore;
+import com.beauty.knowledge.module.file.domain.dto.TaskPageDTO;
 import com.beauty.knowledge.module.file.domain.entity.KbFile;
 import com.beauty.knowledge.module.file.domain.entity.ProcessTask;
 import com.beauty.knowledge.module.file.domain.vo.FileUploadVO;
@@ -31,6 +34,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -89,7 +94,7 @@ public class FileServiceImpl implements FileService {
         // Step 3: upload to MinIO
         String minioPath = minioStorageService.buildPath(fileType, file.getOriginalFilename());
         try {
-            minioStorageService.upload(file.getBytes(), minioPath, file.getContentType());
+            minioPath = minioStorageService.upload(file.getBytes(), minioPath, file.getContentType());
         } catch (IOException ex) {
             throw new BusinessException(ErrorCode.INTERNAL_ERROR, "Read upload file failed");
         }
@@ -123,6 +128,7 @@ public class FileServiceImpl implements FileService {
         // Step 6: send MQ after transaction commit
         Long finalFileId = kbFile.getId();
         Long finalTaskId = task.getId();
+        String finalMinioPath = minioPath;
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
@@ -130,7 +136,7 @@ public class FileServiceImpl implements FileService {
                         ProcessMessage msg = ProcessMessage.builder()
                                 .fileId(finalFileId)
                                 .fileType(fileType)
-                                .minioPath(minioPath)
+                                .minioPath(finalMinioPath)
                                 .categoryId(categoryId)
                                 .knowledgeId(knowledgeId)
                                 .build();
@@ -144,7 +150,7 @@ public class FileServiceImpl implements FileService {
         return FileUploadVO.builder()
                 .fileId(kbFile.getId())
                 .taskId(finalTaskId)
-                .minioPath(minioPath)
+                .minioPath(finalMinioPath)
                 .processStatus(STATUS_PENDING)
                 .build();
     }
@@ -156,6 +162,25 @@ public class FileServiceImpl implements FileService {
             throw new BusinessException(ResultCode.NOT_FOUND, "Task not found");
         }
         return task;
+    }
+
+    @Override
+    public PageResult<ProcessTask> pageTasks(TaskPageDTO dto) {
+        long pageNum = dto.getPageNum() == null || dto.getPageNum() <= 0 ? 1L : dto.getPageNum();
+        long pageSize = dto.getPageSize() == null || dto.getPageSize() <= 0 ? 20L : dto.getPageSize();
+        Page<ProcessTask> page = new Page<>(pageNum, pageSize);
+
+        LocalDateTime start = parseStart(dto.getStartDate());
+        LocalDateTime end = parseEnd(dto.getEndDate());
+        LambdaQueryWrapper<ProcessTask> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StringUtils.hasText(dto.getStatus()), ProcessTask::getStatus, dto.getStatus())
+                .ge(start != null, ProcessTask::getCreatedAt, start)
+                .le(end != null, ProcessTask::getCreatedAt, end)
+                .orderByDesc(ProcessTask::getCreatedAt)
+                .orderByDesc(ProcessTask::getId);
+
+        Page<ProcessTask> result = processTaskMapper.selectPage(page, wrapper);
+        return PageResult.of(result);
     }
 
     @Override
@@ -238,5 +263,21 @@ public class FileServiceImpl implements FileService {
         processTaskMapper.delete(taskQueryWrapper);
         kbFileMapper.deleteById(fileId);
         log.info("File removed, fileId={}, chunkCount={}", fileId, chunkIds.size());
+    }
+
+    private LocalDateTime parseStart(String date) {
+        try {
+            return StringUtils.hasText(date) ? LocalDate.parse(date).atStartOfDay() : null;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private LocalDateTime parseEnd(String date) {
+        try {
+            return StringUtils.hasText(date) ? LocalDate.parse(date).atTime(23, 59, 59) : null;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

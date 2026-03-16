@@ -23,6 +23,10 @@
       max-request-size: 50MB
 
 beauty:
+  jwt:
+    secret: beauty-knowledge-dev-secret-key-2026-32chars
+    expire-in-seconds: 86400
+
   minio:
     endpoint: http://localhost:9000
     access-key: beauty
@@ -41,6 +45,18 @@ beauty:
       provider: ollama
       base-url: http://localhost:11434
       model: qwen2.5:7b
+
+  llm:
+    provider: ollama
+    ollama:
+      base-url: http://localhost:11434
+      model: qwen2.5:7b
+      timeout: 30000
+    qwen:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ""
+      model: qwen-max
+      timeout: 30000
 
   rag:
     bm25-topk: 5

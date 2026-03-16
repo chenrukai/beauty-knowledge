@@ -1,6 +1,6 @@
 package com.beauty.knowledge.module.knowledge.domain.vo;
 
-import com.beauty.knowledge.module.knowledge.domain.entity.KbFile;
+import com.beauty.knowledge.module.file.domain.entity.KbFile;
 import lombok.Builder;
 import lombok.Data;
 

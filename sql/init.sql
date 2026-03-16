@@ -309,11 +309,11 @@ CREATE TABLE entity_extract_pending
 -- 用户（BCrypt）
 -- admin / admin
 INSERT INTO sys_user (username, password, nickname, role, status)
-VALUES ('admin', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '系统管理员', 'admin', 1);
+VALUES ('admin', '$2a$10$XqB9sYGZHeRP3EzvM2QdJetKw5KoW8v8/UUPGtVz2Y68hLSQXMVrm', '系统管理员', 'admin', 1);
 
 -- testuser / user
 INSERT INTO sys_user (username, password, nickname, role, status)
-VALUES ('testuser', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOqpwTTyU.jlm', '测试用户', 'user', 1);
+VALUES ('testuser', '$2a$10$XE5Z1cxKcEFmi0bY9Bjdmuhp4y9ndN3jixZiAo4eXQ.C2xfcKtWz.', '测试用户', 'user', 1);
 
 -- 4个顶级分类
 INSERT INTO kb_category (name, parent_id, level, sort, icon, description)
