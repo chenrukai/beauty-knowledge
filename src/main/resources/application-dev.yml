@@ -1,0 +1,60 @@
+﻿spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/beauty_knowledge?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: beauty
+    password: beauty123
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+beauty:
+  minio:
+    endpoint: http://localhost:9000
+    access-key: beauty
+    secret-key: beauty123456
+
+  milvus:
+    host: localhost
+    port: 19530
+
+  ai:
+    python:
+      base-url: http://localhost:8001
+      timeout: 30000
+    llm:
+      provider: ollama
+      base-url: http://localhost:11434
+      model: qwen2.5:7b
+
+  rag:
+    bm25-topk: 5
+    vector-topk: 5
+    rrf-k: 60
+    rerank-top: 5
+    context-max-round: 3
+    intent-timeout: 30000
+
+  pipeline:
+    max-retry: 3
+    embed-batch-size: 32
+    chunk-size: 400
+    chunk-overlap: 80
+
+  cors:
+    allowed-origins:
+      - http://localhost:5173
